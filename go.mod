@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 require (
 	github.com/caddyserver/caddy/v2 v2.9.1
-	github.com/libdns/domainnameshop v0.1.0
+	github.com/libdns/domainnameshop v0.1.1
 )
 
 require (
