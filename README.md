@@ -8,6 +8,12 @@ This package contains a DNS provider module for [Caddy](https://github.com/caddy
 dns.providers.domainnameshop
 ```
 
+## Known issues
+
+This provider may have slow propagation time for dns records, it's recommended to add a ``propagation_delay`` of at least ``60s`` for reliable challenges.
+
+This is noted in the examples for the caddyfile.
+
 ## Config examples
 
 To use this module for the ACME DNS challenge, [configure the ACME issuer in your Caddy JSON](https://caddyserver.com/docs/json/apps/tls/automation/policies/issuer/acme/) like so:
@@ -29,20 +35,36 @@ To use this module for the ACME DNS challenge, [configure the ACME issuer in you
 
 or with the Caddyfile:
 
+### globally
 ```
-# globally
 {
 	acme_dns domainnameshop <api_token> <api_secret>
 }
 ```
 
+### one site
 ```
-# one site
 example.com {
 	respond "Hello World" 
 	tls {
 		dns domainnameshop <api_token> <api_secret>
+		propagation_delay 60s
+	}
+}
+```
+### reusable import
+```
+(dnschallenge) {
+	tls {
+		dns domainnameshop <api_token> <api_secret>
+		propagation_delay 60s
 	}
 }
 
+example.com {
+	respond "Hello World" 
+	import dnschallenge
+}
 ```
+
+
