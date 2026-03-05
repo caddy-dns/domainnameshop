@@ -1,6 +1,8 @@
 package domainnameshop
 
 import (
+	"fmt"
+
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/libdns/domainnameshop"
@@ -23,8 +25,15 @@ func (Provider) CaddyModule() caddy.ModuleInfo {
 
 // Provision sets up the module. Implements caddy.Provisioner.
 func (p *Provider) Provision(ctx caddy.Context) error {
-	p.Provider.APIToken = caddy.NewReplacer().ReplaceAll(p.Provider.APIToken, "")
-	p.Provider.APISecret = caddy.NewReplacer().ReplaceAll(p.Provider.APISecret, "")
+	repl := caddy.NewReplacer()
+	p.Provider.APIToken = repl.ReplaceAll(p.Provider.APIToken, "")
+	p.Provider.APISecret = repl.ReplaceAll(p.Provider.APISecret, "")
+	if p.Provider.APIToken == "" {
+		return fmt.Errorf("domainnameshop: API token is empty after substitution")
+	}
+	if p.Provider.APISecret == "" {
+		return fmt.Errorf("domainnameshop: API secret is empty after substitution")
+	}
 	return nil
 }
 
@@ -76,7 +85,7 @@ func (p *Provider) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 		return d.Err("missing API token")
 	}
 	if p.Provider.APISecret == "" {
-		return d.Err("missing API token")
+		return d.Err("missing API secret")
 	}
 	return nil
 }
